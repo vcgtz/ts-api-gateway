@@ -28,6 +28,7 @@ export default class Server {
 
     this.registerMiddlewares();
     this.registerRoutes();
+    this.registerProxyRoutes();
   }
 
   private registerRoutes(): void {
@@ -77,15 +78,22 @@ export default class Server {
     this.app.use(
       helmet()
     );
+  }
+
+  private registerProxyRoutes(): void {
+    this.app.use(
+      '/pokemon',
+      createProxyMiddleware({
+        target: 'https://pokeapi.co/api/v2/pokemon/',
+        changeOrigin: true,
+      })
+    );
 
     this.app.use(
-      '/search',
+      '/rick-and-morty',
       createProxyMiddleware({
-        target: 'http://api.duckduckgo.com/',
+        target: 'https://rickandmortyapi.com/api/character/',
         changeOrigin: true,
-        pathRewrite: {
-          [`^/search`]: '',
-        }
       })
     );
   }
