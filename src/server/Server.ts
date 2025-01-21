@@ -1,5 +1,6 @@
 import express, { Express, Request, Response, Router } from 'express';
 import session from 'express-session';
+import rateLimit from 'express-rate-limit';
 import AppRouter from './Router';
 
 export default class Server {
@@ -33,6 +34,12 @@ export default class Server {
       resave: false,
       saveUninitialized: true,
       store: this.store,
+    }));
+
+    this.app.use(rateLimit({
+      windowMs: 5 * 60 * 1000,
+      limit: 5,
+      message: { msg: 'Too many requests, please try again later.' }
     }));
   }
 
