@@ -1,6 +1,9 @@
 import express, { Express, Request, Response, Router } from 'express';
 import session from 'express-session';
 import rateLimit from 'express-rate-limit';
+import winston from 'winston';
+import expressWinston from 'express-winston';
+import responseTime from 'response-time';
 import AppRouter from './Router';
 
 export default class Server {
@@ -40,6 +43,20 @@ export default class Server {
       windowMs: 5 * 60 * 1000,
       limit: 5,
       message: { msg: 'Too many requests, please try again later.' }
+    }));
+
+    this.app.use(responseTime());
+
+    this.app.use(expressWinston.logger({
+      transports: [new winston.transports.Console()],
+      format: winston.format.json(),
+      statusLevels: true,
+      meta: false,
+      msg: 'HTTP {{req.method}} {{req.url}} {{res.statusCode}} {{res.responseTime}}ms',
+      expressFormat: true,
+      ignoreRoute() {
+        return false;
+      },
     }));
   }
 
