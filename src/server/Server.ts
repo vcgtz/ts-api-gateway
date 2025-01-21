@@ -6,6 +6,7 @@ import expressWinston from 'express-winston';
 import responseTime from 'response-time';
 import cors from 'cors';
 import helmet from 'helmet';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import AppRouter from './Router';
 
 export default class Server {
@@ -75,6 +76,17 @@ export default class Server {
 
     this.app.use(
       helmet()
+    );
+
+    this.app.use(
+      '/search',
+      createProxyMiddleware({
+        target: 'http://api.duckduckgo.com/',
+        changeOrigin: true,
+        pathRewrite: {
+          [`^/search`]: '',
+        }
+      })
     );
   }
 
